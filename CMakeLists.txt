@@ -8,14 +8,14 @@ enable_testing()
 
 # Includes and libraries
 if (WIN32)
-    set(SDL2_DIR ${CMAKE_SOURCE_DIR}/external/SDL2-2.0.30)
+    set(SDL3_DIR ${CMAKE_SOURCE_DIR}/external/SDL3-3.1.7)
     set(GLEW_DIR ${CMAKE_SOURCE_DIR}/external/glew-2.2.0)
 endif (WIN32)
 
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 
-find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS})
+find_package(SDL3 REQUIRED)
+include_directories(${SDL3_INCLUDE_DIRS})
 
 find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
@@ -28,10 +28,10 @@ add_subdirectory( src/game )
 
 # Executable and link
 if (NOT WIN32)
-    string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
+    string(STRIP ${SDL3_LIBRARIES} SDL3_LIBRARIES)
 endif (NOT WIN32)
 add_executable(${PROJECT_NAME} src/main.cpp)
-target_link_libraries(${PROJECT_NAME} game engine ${SDL2_LIBRARIES} ${GLEW_LIBRARIES} OpenGL::GL)
+target_link_libraries(${PROJECT_NAME} game engine ${SDL3_LIBRARIES} ${GLEW_LIBRARIES} OpenGL::GL)
 
 # Copying assets to the build folder
 add_custom_command(
@@ -47,9 +47,9 @@ if (WIN32)
     add_custom_command(
             TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
-            ${SDL2_DIR}/lib/x64/SDL2.dll
+            ${SDL3_DIR}/lib/x64/SDL3.dll
             $<TARGET_FILE_DIR:${PROJECT_NAME}>
-            COMMENT "---- Copy SDL2.dll")
+            COMMENT "---- Copy SDL3.dll")
 
     add_custom_command(
             TARGET ${PROJECT_NAME} POST_BUILD
