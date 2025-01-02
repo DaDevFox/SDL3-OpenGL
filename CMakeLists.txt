@@ -8,8 +8,8 @@ enable_testing()
 
 # Includes and libraries
 if (WIN32)
-    set(SDL3_DIR ${CMAKE_SOURCE_DIR}/external/SDL3-3.1.7)
-    set(GLEW_DIR ${CMAKE_SOURCE_DIR}/external/glew-2.2.0)
+    #set(SDL3_DIR ${CMAKE_SOURCE_DIR}/external/SDL3-3.1.7)
+    #set(GLEW_DIR ${CMAKE_SOURCE_DIR}/external/glew-2.2.0)
 endif (WIN32)
 
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
@@ -31,7 +31,7 @@ if (NOT WIN32)
     string(STRIP ${SDL3_LIBRARIES} SDL3_LIBRARIES)
 endif (NOT WIN32)
 add_executable(${PROJECT_NAME} src/main.cpp)
-target_link_libraries(${PROJECT_NAME} game engine ${SDL3_LIBRARIES} ${GLEW_LIBRARIES} OpenGL::GL)
+target_link_libraries(${PROJECT_NAME} game engine SDL3::SDL3 ${GLEW_LIBRARIES} OpenGL::GL)
 
 # Copying assets to the build folder
 add_custom_command(
