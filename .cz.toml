@@ -1,0 +1,52 @@
+[tool.commitizen]
+name = "cz_customize"
+version = "0.16.0"
+
+[tool.commitizen.customize]
+message_template = "[{{tag1}}:{{tag2}}] {{message}}"
+example = "MOD:ENH Added linear regression to toolstack"
+schema = "<type> <body>"
+schema_pattern = "(\\[[A-Z]+:[A-Z]+\\])(\\s.*)"
+bump_pattern = "(BREAK|FIX|FEAT|ENH|ICM|PERF|DEL)"
+bump_map = { "BREAK" = "MAJOR", "DEL" = "MINOR", "ENH" = "MINOR", "ICM" = "MINOR", "FEAT" = "MINOR", "FIX" = "PATCH", "PERF" = "PATCH" }
+change_type_order = ["BREAK", "FEAT", "FIX", "REF", "PERF"]
+
+[[tool.commitizen.customize.questions]]
+type = "list"
+name = "tag1"
+choices = [
+    { value = "PPL ", name = "Pipeline related" },
+    { value = "MOD ", name = "Model related" },
+    { value = "EXP ", name = "Explorations" },
+    { value = "DAT ", name = "Data related" },
+    { value = "DPLY", name = "Deployment related" },
+    { value = "ORG ", name = "Organisation related" },
+    { value = "CI  ", name = "CI related" },
+    { value = "OPS ", name = "Operations related" },
+    { value = "NBK ", name = "Notebook related" },
+    { value = "DEP ", name = "Dependencies related" },
+]
+message = "Select what topic the commit is realted to"
+
+[[tool.commitizen.customize.questions]]
+type = "list"
+name = "tag2"
+choices = [
+    { value = "FIX ", name = "A bug fix. Correlates with PATCH in SemVer" },
+    { value = "FEAT", name = "A new feature. Correlates with MINOR in SemVer" },
+    { value = "ENH ", name = "Enhancement. Correlates with MINOR in SemVer" },
+    { value = "BRK!", name = "A breaking change. Correlates with MAJOR in SemVer" },
+    { value = "DEL ", name = "Delete Script/Function/Class. Correlates with MINOR in SemVer" },
+    { value = "DOCS", name = "Documentation only changes" },
+    { value = "ICM ", name = "Initial Commit of New Script/Class/Function. Correlates with MINOR in SemVer" },
+    { value = "PERF", name = "A code change that improves performance. Correlates with PATCH in SemVer" },
+    { value = "REF ", name = "A code change that neither fixes a bug nor adds a feature" },
+    { value = "FMT ", name = "Changes that do not affect the meaning of the code (white-space, formatting, mis" },
+    { value = "TEST", name = "Adding missing or correcting existing tests" },
+]
+message = "Select the scope of the commit"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "message"
+message = "Describe your commit in a message"
