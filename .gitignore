@@ -11,9 +11,28 @@
 
 # Builds
 build/
-release/
+[Dd]ebug/
+[Rr]elease/
 .vscode/ipch
 cmake-build-*
 
-#IDE
+# IDE
 .idea
+.vs
+
+# NuGet packages
+packages/
+
+# MSVC/MSBuild Generated Files
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# CMake Configuration Files
+*.cmake
+CMakeFiles/
+src/engine/CMakeFiles/
+src/game/CMakeFiles/
+DartConfiguration.tcl
+
