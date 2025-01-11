@@ -19,23 +19,23 @@ extern "C" { int NvOptimusEnablement = 1; }
 extern "C" { int AmdPowerXpressRequestHighPerformance = 1; }
 #endif
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	const std::string title = "Tetris";
 	const int SCREEN_WIDTH = 450;
 	const int SCREEN_HEIGHT = 680;
 
-    // Init logging
-    LOG_CONFIG.reporting_level = Debug;
-    LOG_CONFIG.restart = true;
-    if (LOG_CONFIG.restart)
-    {
-        Log::restart();
-    }
+	// Init logging
+	LOG_CONFIG.reporting_level = Debug;
+	LOG_CONFIG.restart = true;
+	if (LOG_CONFIG.restart)
+	{
+		Log::restart();
+	}
 
-    Engine engine(std::make_unique<Game>(), title, SCREEN_WIDTH, SCREEN_HEIGHT);
-    engine.start();
-    engine.run();
-    engine.shutdown();
+	Engine engine(std::make_unique<Game>(), title, SCREEN_WIDTH, SCREEN_HEIGHT);
+	engine.start();
+	engine.run();
+	engine.shutdown();
 	return 0;
 }
