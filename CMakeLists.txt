@@ -1,10 +1,34 @@
 cmake_minimum_required(VERSION 3.5.0)
 set(CMAKE_CXX_STANDARD 17)
-project(Tetris VERSION 0.1.0)
 set(OpenGL_GL_PREFERENCE "GLVND")
+
+# vcpkg configuration
+set(VCPKG_MANIFEST_MODE ON)
+set(VCPKG_APPLOCAL_DEPS ON)
+
+project(Tetris VERSION 0.1.0)
 
 include(CTest)
 enable_testing()
+
+# vcpkg environment var integration (thanks https://github.com/zenustech/zeno/)
+if (DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    message(STATUS "VCPKG_ROOT: $ENV{VCPKG_ROOT}")
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+endif()
+
+if (DEFINED ENV{VCPKG_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
+    message(STATUS "VCPKG_TRIPLET: $ENV{VCPKG_TRIPLET}")
+    set(VCPKG_TARGET_TRIPLET "$ENV{VCPKG_TRIPLET}" CACHE STRING "")
+endif()
+
+
+if (MSVC AND NOT DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
+    # MSVC sucks /MD /MT /MDd /MTd options....
+    # MultiThreadedDLL = /MD, MultiThreadedDebugDLL = /MDd
+    # MultiThreaded = /MT, MultiThreadedDebug = /MTd
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+endif()
 
 # Includes and libraries
 if (WIN32)
@@ -12,6 +36,7 @@ if (WIN32)
     #set(GLEW_DIR ${CMAKE_SOURCE_DIR}/external/glew-2.2.0)
 endif (WIN32)
 
+# dependencies
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 
 find_package(SDL3 REQUIRED)
@@ -26,14 +51,12 @@ find_package(OpenGL)
 add_subdirectory( src/engine )
 add_subdirectory( src/game )
 
-# Executable and link
-if (NOT WIN32)
-    string(STRIP ${SDL3_LIBRARIES} SDL3_LIBRARIES)
-endif (NOT WIN32)
+# executable configuration + linking
 add_executable(${PROJECT_NAME} src/main.cpp)
-target_link_libraries(${PROJECT_NAME} game engine SDL3::SDL3 ${GLEW_LIBRARIES} OpenGL::GL)
+target_link_libraries(${PROJECT_NAME} PRIVATE game engine)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL3_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_gl_LIBRARY})
 
-# Copying assets to the build folder
+# copy assets to the build folder
 add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -42,22 +65,8 @@ add_custom_command(
         COMMENT "---- Copy Assets"
 )
 
-# Copying dlls to the build folder
-if (WIN32)
-    add_custom_command(
-            TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            ${SDL3_DIR}/lib/x64/SDL3.dll
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-            COMMENT "---- Copy SDL3.dll")
-
-    add_custom_command(
-            TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            ${GLEW_DIR}/bin/Release/x64/glew32.dll
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-            COMMENT "---- Copy glew32.dll")
-endif (WIN32)
+# copy dependant dynamically linked libraries to the build folder
+set(COPY_DLLS_TO_OUTPUT TRUE)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
