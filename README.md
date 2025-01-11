@@ -1,6 +1,6 @@
-# SDL2 + OpenGL
+# SDL3 + OpenGL
 
-This is a SDL2 + OpenGL template, written in C++, that you can use as a starter for any project. MIT licensed.
+This is a SDL3 + OpenGL template, written in C++, that you can use as a starter for any project. MIT licensed.
 
 *Anniversary edition: Refactored on 2024-02-04.*
 
@@ -30,50 +30,24 @@ LICENCE         // Your rights
 Readme.md       // This file ;)
 ```
 
-# Libraries
+> NOTE: 
+> For the CMake configuration and certain build generators, the system path of this project must not include spaces.
 
-## Linux: Get SDL2
+# Dependencies
 
-This tutorial is for Debian-distributions - I use LUbuntu and Linux-Mint. You can easily adapt it to other distros. You are a Linux user, after all.
+This project has migrated to usage of `vcpkg`, the Microsoft-provided C++ package manager.
 
-```
-sudo apt install libsdl2-dev libsdl2-2.0-0 -y;
+It comes installed with Visual Studio 2022 on Windows (by default at the path `C:\Program Files\Microsoft Visual Studio\2022\Community\VC\vcpkg`). 
+If you do not have Visual Studio 2022 on Windows you may not have C/C++ compilation tools on your system, see the section below before installing vcpkg. 
+You can also install it [from the website](https://vcpkg.io/en/).
 
-sudo apt install libmikmod-dev libfishsound1-dev libsmpeg-dev liboggz2-dev libflac-dev libfluidsynth-dev libsdl2-mixer-dev libsdl2-mixer-2.0-0 -y;
+Once vcpkg is installed, you can `cd` into the project root and install the dependencies with the following commands:
 
-sudo apt install libfreetype6-dev libsdl2-ttf-dev libsdl2-ttf-2.0-0 -y;
-```
-
-It is a possibility that your distribution does not embed the last SDL2 version. If you want the last versions, get the last tar.gz sources file from:
-- SDL2: https://github.com/libsdl-org/SDL/releases/
-
-Then decompress them, open a terminal, and go in each folder, where you will execute:
-
-```
-./configure
-make 
-sudo make install
+```bash
+vcpkg install
 ```
 
-You will need two additional libraries to run this template. GLEW, which eases the use of OpenGL, and GLM, which prevents you from writing math calculus.
-
-Install GLEW and GLM:
-
-If needed, latest GLEW version can be found here:
-- https://github.com/nigels-com/glew/releases/
-
-```
-sudo apt update
-sudo apt install libglew-dev libglm-dev -y;
-
-```
-
-## Windows
-
-Dependencies are already ready in the `external` folder.
-
-If you want more libraries, put them in the `external` folder.
-
+This will install SDL3 and glew.
 
 # Compile tools
 
@@ -119,100 +93,7 @@ There are two ways to get MSVC:
 
 If you want to use the easy way to set up your compilation, on multiple platforms, install CMake from http://cmake.org.
 
-
-# Build configuration
-
-## Option 1: CMake
-
-First create a `CMakeLists.txt` file in the root folder of your workspace. It will contain CMake config, includes and dependencies.
-
-Root `CMakeLists.txt`
-```
-cmake_minimum_required(VERSION 3.5.0)
-set(CMAKE_CXX_STANDARD 17)
-project(Tetris VERSION 0.1.0)
-set(OpenGL_GL_PREFERENCE "GLVND")
-
-include(CTest)
-enable_testing()
-
-# Includes and libraries
-if (WIN32)
-    set(SDL2_DIR ${CMAKE_SOURCE_DIR}/external/SDL2-2.0.30)
-    set(GLEW_DIR ${CMAKE_SOURCE_DIR}/external/glew-2.2.0)
-endif (WIN32)
-
-find_package(OpenGL REQUIRED COMPONENTS OpenGL)
-
-find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS})
-
-find_package(GLEW REQUIRED)
-include_directories(${GLEW_INCLUDE_DIRS})
-
-find_package(OpenGL)
-
-# subdirectories
-add_subdirectory( src/engine )
-add_subdirectory( src/game )
-
-# Executable and link
-if (NOT WIN32)
-    string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
-endif (NOT WIN32)
-add_executable(${PROJECT_NAME} src/main.cpp)
-target_link_libraries(${PROJECT_NAME} game engine ${SDL2_LIBRARIES} ${GLEW_LIBRARIES} OpenGL::GL)
-
-# Copying assets to the build folder
-add_custom_command(
-        TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_CURRENT_LIST_DIR}/assets
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets
-        COMMENT "---- Copy Assets"
-)
-
-# Copying dlls to the build folder
-if (WIN32)
-    add_custom_command(
-            TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            ${SDL2_DIR}/lib/x64/SDL2.dll
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-            COMMENT "---- Copy SDL2.dll")
-
-    add_custom_command(
-            TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy
-            ${GLEW_DIR}/bin/Release/x64/glew32.dll
-            $<TARGET_FILE_DIR:${PROJECT_NAME}>
-            COMMENT "---- Copy glew32.dll")
-endif (WIN32)
-
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
-```
-This file handles asset copy and dlls copy to the build folder. It also includes the two subdirectories, `engine` and `game`, which will be compiled thanks to the following.
-
-Now create two `CMakeLists.txt` files, one in the `src/engine` folder, one in the `src/game` folder.
-
-`src/engine/CMakeLists.txt`
-```
-file( GLOB engine_SOURCES *.cpp )
-add_library( engine ${engine_SOURCES} )
-target_include_directories(engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-```
-
-`src/game/CMakeLists.txt`
-```
-file( GLOB game_SOURCES *.cpp )
-add_library( game ${game_SOURCES} )
-target_include_directories(game PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-```
-The first file will use the other CMake lists to compile the content of each folder.
-
-You are now ready, you can use CMake to configure build, clean your game. There is no release configuration yet.
+CMakeLists.txt files are provided to configure and compile two statically linked libraries (engine and game) and an output executable.
 
 ## Option 2: Classic compilation with makefile
 
